@@ -39,4 +39,6 @@ for message in s3_queue.receive_messages():
                                     'StringValue': object_name,
                                     'DataType': 'String'},
                         })
+            # Let the queue know that the message is processed
+            message.delete()
 
