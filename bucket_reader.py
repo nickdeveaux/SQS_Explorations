@@ -17,24 +17,27 @@ sqs = boto3.resource('sqs')
 s3_queue = sqs.get_queue_by_name(QueueName='test')
 worker_queue = sqs.get_queue_by_name(QueueName='worker_input')
 
-# Process messages by printing out body and optional author name
-for message in s3_queue.receive_messages():
-    body = ast.literal_eval(message.body)
-    if body != None and 'Records' in body:
-        record = body['Records'][0]
-        if 's3' in record:
-            object_name = record['s3']['object']['key']
-            bucket = record['s3']['bucket']
-            lines = parse_s3_object(bucket['name'], object_name)
-            for line in lines:
-                worker_queue.send_message(MessageBody='worker_input', MessageAttributes={
-                        'Url': {
-                                    'StringValue': line,
-                                    'DataType': 'String'},
-                        'Source': {
-                                    'StringValue': object_name,
-                                    'DataType': 'String'},
-                        })
-            # Let the queue know that the message is processed
-            message.delete()
+# Always be polling
+while True:
 
+    # Process messages by printing out body and optional author name
+    for message in s3_queue.receive_messages():
+        body = ast.literal_eval(message.body)
+        if body != None and 'Records' in body:
+            record = body['Records'][0]
+            if 's3' in record:
+                object_name = record['s3']['object']['key']
+                bucket = record['s3']['bucket']
+                lines = parse_s3_object(bucket['name'], object_name)
+                for line in lines:
+                    worker_queue.send_message(MessageBody='worker_input', MessageAttributes={
+                            'Url': {
+                                        'StringValue': line,
+                                        'DataType': 'String'},
+                            'Source': {
+                                        'StringValue': object_name,
+                                        'DataType': 'String'},
+                            })
+                # Let the queue know that the message is processed
+                message.delete()
+sleep(1)
