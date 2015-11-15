@@ -1,9 +1,6 @@
 import boto3
 import ast
 
-def print_done():
-    print 'Finished Downloading'
-
 def parse_s3_object(bucket_name, object_name):
     s3 = boto3.resource('s3')
     destination = '/tmp/' + object_name
@@ -22,7 +19,6 @@ worker_queue = sqs.get_queue_by_name(QueueName='worker_input')
 
 # Process messages by printing out body and optional author name
 for message in s3_queue.receive_messages():
-    import pdb; pdb.set_trace()
     body = ast.literal_eval(message.body)
     if body != None and 'Records' in body:
         record = body['Records'][0]
