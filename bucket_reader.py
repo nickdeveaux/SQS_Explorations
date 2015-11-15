@@ -31,10 +31,12 @@ for message in s3_queue.receive_messages():
             bucket = record['s3']['bucket']
             lines = parse_s3_object(bucket['name'], object_name)
             for line in lines:
-                worker_queue.send_message(MessageBody='', MessageAttributes={
+                worker_queue.send_message(MessageBody='worker_input', MessageAttributes={
                         'Url': {
-                                    'StringValue': line},
+                                    'StringValue': line,
+                                    'DataType': 'String'},
                         'Source': {
-                                    'StringValue': object_name}
+                                    'StringValue': object_name,
+                                    'DataType': 'String'},
                         })
 
