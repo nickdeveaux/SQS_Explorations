@@ -14,7 +14,7 @@ def parse_s3_object(bucket_name, object_name):
 sqs = boto3.resource('sqs')
 
 # Get the queue
-s3_queue = sqs.get_queue_by_name(QueueName='test')
+s3_queue = sqs.get_queue_by_name(QueueName='sentinel_input')
 worker_queue = sqs.get_queue_by_name(QueueName='worker_input')
 
 # Always be polling
